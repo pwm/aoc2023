@@ -1,0 +1,12 @@
+:load src/AoC/Lib/Prelude.hs
+
+import AoC.Lib.Prelude
+
+:def pp \_ -> pure $ ":set -interactive-print=Text.Pretty.Simple.pPrint"
+:def pp160 \_ -> pure $ ":set -interactive-print=ppw160"
+:def pp200 \_ -> pure $ ":set -interactive-print=ppw200"
+:def nopp \_ -> pure $ ":set -interactive-print=print"
+
+:set +s
+:set prompt "λ "
+:set -fno-warn-type-defaults

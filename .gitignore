@@ -1,0 +1,10 @@
+.ghc.environment*
+.envrc.private
+.hie
+.direnv
+cabal.project.local
+dist-newstyle
+result*
+aoc.svg*
+aoc.prof*
+*~

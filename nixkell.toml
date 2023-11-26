@@ -1,0 +1,53 @@
+# Nixkell config
+
+[ghc]
+# Warning: if you don't choose one from the currently available versions
+# https://github.com/NixOS/nixpkgs/tree/master/pkgs/development/compilers/ghc
+# you will most likely have to compile *everything* yourself.
+version = "9.4.6"
+profiling = false
+
+# List of tools to be available in the nix shell
+[env]
+
+# We want these tools to be built with our haskell
+haskell_tools = [
+  "haskell-language-server",
+  "hlint",
+  "hpack",
+  "ormolu",
+  "ghc-prof-flamegraph",
+  "profiteur",
+  "profiterole",
+  "ghc-events",
+]
+
+tools = [
+  "alejandra",
+  "cabal-install",
+  "cabal2nix",
+  "nil",
+  "niv",
+  "nodePackages.prettier",
+  "shellcheck",
+  "shfmt",
+  "treefmt",
+]
+
+# List of plugins the you don't want to build
+[hls]
+disable_plugins = [
+  "fourmolu",
+  "floskell",
+]
+
+# These files and directories will be excluded from the nix build,
+# meaning there is no nix rebuild when changing them.
+[ignore]
+files = [
+  "README.md",
+]
+paths = [
+  ".github",
+  ".vscode",
+]
