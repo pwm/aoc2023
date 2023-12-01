@@ -123,7 +123,7 @@ import NeatInterpolation as X (trimming, untrimming)
 import System.IO as X (stdin)
 import System.IO.Unsafe as X (unsafePerformIO)
 import Text.Pretty.Simple (CheckColorTty (..), OutputOptions (..), StringOutputStyle (..), pPrintOpt, pShowOpt)
-import Text.Read (readMaybe)
+import Text.Read as X (readMaybe)
 import Prelude as X
 
 load :: IO String

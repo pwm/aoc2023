@@ -35,6 +35,7 @@ library
       AoC.Lib.Memo
       AoC.Lib.Parser
       AoC.Lib.Prelude
+      AoC.Puzzles.Y2023D01
   other-modules:
       Paths_aoc
   hs-source-dirs:
@@ -219,6 +220,7 @@ test-suite spec
   main-is: Spec.hs
   other-modules:
       AoC.Tester
+      AoC.Tests.Y2023D01Spec
       Paths_aoc
   hs-source-dirs:
       test

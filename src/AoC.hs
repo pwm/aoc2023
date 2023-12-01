@@ -4,6 +4,7 @@ import AoC.Core.ArgParser
 import AoC.Core.Fetcher
 import AoC.Core.Solver
 import AoC.Lib.Prelude
+import AoC.Puzzles.Y2023D01 qualified as Y2023D01
 import Data.Map.Strict qualified as Map
 
 aoc :: IO ()
@@ -15,4 +16,5 @@ aoc =
 solutions :: Solutions
 solutions =
   Map.fromList
-    []
+    [ ((2018, 01), mkSolverFor Y2023D01.parse Y2023D01.solveA Y2023D01.solveB)
+    ]
