@@ -47,7 +47,7 @@ s0 =
 -- Copy example here
 |]
 
--- load actual input from gthe downloaded file
+-- load actual input from the downloaded file
 ss :: String
 ss = unsafePerformIO $ loadDate ${year} ${day}
 {-# NOINLINE ss #-}
