@@ -12,9 +12,6 @@ solveA = maybe 0 sum . traverse (stringToInt . ends . filter isDigit)
 solveB :: [String] -> Int
 solveB = maybe 0 sum . traverse (digitsToInt . ends) . mapMaybe digitify
 
-ends :: [a] -> [a]
-ends s = take 1 s <> takeEnd 1 s
-
 digitify :: String -> Maybe [Int]
 digitify = parseMaybe (catMaybes <$> some (digitP <|> digitTextP))
 

@@ -135,17 +135,17 @@ astarWithParents ::
   (n -> Bool) ->
   n ->
   [(n, (Int, Maybe n))]
-astarWithParents nexts found from = go mempty (MinPQueue.singleton 0 (from, Nothing))
+astarWithParents nexts found from = go mempty (MinPQueue.singleton 0 (from, 0, Nothing))
   where
-    go :: Set n -> MinPQueue Int (n, Maybe n) -> [(n, (Int, Maybe n))]
+    go :: Set n -> MinPQueue Int (n, Int, Maybe n) -> [(n, (Int, Maybe n))]
     go seen unseen = case MinPQueue.minViewWithKey unseen of
       Nothing -> []
-      Just ((cost, (node, parent)), unseen')
+      Just ((costWithH, (node, cost, parent)), unseen')
         | found node -> [(node, (cost, parent))]
         | Set.member node seen -> go seen unseen'
         | otherwise ->
-            let addNode :: MinPQueue Int (n, Maybe n) -> (n, (Int, Int)) -> MinPQueue Int (n, Maybe n)
-                addNode mpq (n, (stepCost, h)) = MinPQueue.insert (cost + stepCost + h) (n, Just node) mpq
+            let addNode :: MinPQueue Int (n, Int, Maybe n) -> (n, (Int, Int)) -> MinPQueue Int (n, Int, Maybe n)
+                addNode mpq (n, (stepCost, h)) = MinPQueue.insert (costWithH + stepCost + h) (n, cost + stepCost, Just node) mpq
              in (node, (cost, parent)) : go (Set.insert node seen) (foldl' addNode unseen' (nexts node))
 
 -- Builds shortest path from root (identified by Nothing as its parent) to dest

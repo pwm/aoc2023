@@ -32,6 +32,7 @@ module AoC.Lib.Prelude
     rpad,
     withIO,
     ddf,
+    ocr,
     fixpoint,
     fixpointL,
     fixpointM,
@@ -43,6 +44,11 @@ module AoC.Lib.Prelude
     maximumOr,
     takeEnd,
     dropEnd,
+    rotL1,
+    rotR1,
+    rotL,
+    rotR,
+    ends,
     enumerate,
     hasKeys,
     rsort,
@@ -58,7 +64,6 @@ module AoC.Lib.Prelude
     slicesOf,
     lookups,
     setLookups,
-    rotate1,
     compose,
     composeM,
     times,
@@ -85,6 +90,7 @@ import Control.Arrow as X ((&&&))
 import Control.Lens as X (Each (..), element, filtered, filteredBy, folded, maximumByOf, maximumOf, minimumByOf, minimumOf, over, preview, review, set, sumOf, toListOf, use, uses, view, (%=), (%~), (*~), (+=), (+~), (-~), (.=), (.~), (<>~), (^.), (^..), (^?), _1, _2, _3, _4, _5, _Just, _Nothing)
 import Control.Monad.Combinators as X
 import Control.Monad.Logic (MonadLogic, interleave)
+import Control.Monad.Reader as X
 import Control.Monad.State.Strict as X
 import Data.Bifunctor as X
 import Data.Bitraversable as X
@@ -242,6 +248,9 @@ ddf file a = unsafePerformIO $ do
   !_ <- appendFile file (show a <> "\n")
   pure (pure ())
 
+ocr :: String -> String
+ocr = fromMaybe "" . asciiMapToLetters (Set.singleton '#')
+
 -- strict
 fixpoint :: (Eq a) => (a -> a) -> a -> a
 fixpoint f x | y <- f x = if y `seq` x == y then y else fixpoint f y
@@ -294,15 +303,37 @@ maximumOr = withDefault maximum
 withDefault :: (Foldable t) => (t a -> a) -> a -> t a -> a
 withDefault f def = fromMaybe def . (\t -> if null t then Nothing else Just (f t))
 
--- takeEnd 1 [1..3] -> [1, 2]
+-- >>> (takeEnd 1 [], takeEnd 1 [1], takeEnd 1 [1,2], takeEnd 1 [1..3])
+-- ([],[1],[2],[3])
 takeEnd :: Int -> [a] -> [a]
 takeEnd n xs = drop (length xs - n) xs
 
--- dropEnd 1 [1..3] -> [1, 2]
+-- >>> (dropEnd 1 [], dropEnd 1 [1], dropEnd 1 [1,2], dropEnd 1 [1..3])
+-- ([],[],[1],[1,2])
 dropEnd :: Int -> [a] -> [a]
 dropEnd n xs = take (length xs - n) xs
 
--- enumerate @Bool -> [False,True]
+-- >>> (rotL1 [1,2,3], rotR1 [1,2,3])
+-- ([2,3,1],[3,1,2])
+rotL1, rotR1 :: [a] -> [a]
+rotL1 l = drop 1 l <> take 1 l
+rotR1 l = takeEnd 1 l <> dropEnd 1 l
+
+-- >>> (rotL 0 [1,2,3], rotL 1 [1,2,3], rotL 2 [1,2,3], rotL 3 [1,2,3])
+-- >>> (rotR 0 [1,2,3], rotR 1 [1,2,3], rotR 2 [1,2,3], rotR 3 [1,2,3])
+-- ([1,2,3],[2,3,1],[3,1,2],[1,2,3])
+-- ([1,2,3],[3,1,2],[2,3,1],[1,2,3])
+rotL, rotR :: Int -> [a] -> [a]
+rotL n = times n rotL1
+rotR n = times n rotR1
+
+-- >>> (ends [] , ends [1], ends [1,2], ends [1..3])
+-- ([],[1,1],[1,2],[1,3])
+ends :: [a] -> [a]
+ends s = take 1 s <> takeEnd 1 s
+
+-- >>> enumerate @Bool
+-- [False,True]
 enumerate :: forall a. (Bounded a, Enum a) => [a]
 enumerate = enumFrom (minBound @a)
 
@@ -360,9 +391,6 @@ lookups m = mapMaybe (m !?)
 setLookups :: (Ord v) => Set v -> [v] -> [v]
 setLookups s = mapMaybe $
   \v -> if Set.member v s then Just v else Nothing
-
-rotate1 :: [a] -> [a]
-rotate1 l = drop 1 l <> take 1 l
 
 substring :: Int -> Int -> String -> String
 substring start end = take (end - start) . drop start

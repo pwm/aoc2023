@@ -22,6 +22,9 @@ step4 = stepWith d2p4
 move4 :: Pos -> [Dir4] -> Pos
 move4 = moveWith d2p4
 
+path4 :: Pos -> [Dir4] -> [Pos]
+path4 = pathWith d2p4
+
 --
 
 data Dir8 = N | NE | E | SE | S | SW | W | NW
@@ -38,6 +41,9 @@ step8 = stepWith d2p8
 
 move8 :: Pos -> [Dir8] -> Pos
 move8 = moveWith d2p8
+
+path8 :: Pos -> [Dir8] -> [Pos]
+path8 = pathWith d2p8
 
 --
 
@@ -94,7 +100,10 @@ move :: Pos -> [Pos] -> Pos
 move = moveWith id
 
 moveWith :: (a -> Pos) -> Pos -> [a] -> Pos
-moveWith d2p = foldr (flip (stepWith d2p))
+moveWith d2p = foldl' (stepWith d2p)
+
+pathWith :: (a -> Pos) -> Pos -> [a] -> [Pos]
+pathWith d2p = scanl' (stepWith d2p)
 
 neighbours4 :: GridOf a -> Pos -> [Pos]
 neighbours4 m = filter (`Map.member` m) . adj4
