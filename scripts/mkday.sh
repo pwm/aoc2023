@@ -40,6 +40,9 @@ solveB _ = ()
 ---------------------------------------------------------------------------
 -- Test data
 
+p :: String -> ()
+p = fromJust . parse
+
 s0 :: String
 s0 =
   unpack

@@ -83,7 +83,7 @@
 
   scripts = import ./scripts.nix {inherit pkgs;};
 in {
-  bin = util.leanPkg ourHaskell.aoc;
+  bin = pkgs.haskell.lib.dontCheck(util.leanPkg ourHaskell.aoc);
 
   shell = pkgs.buildEnv {
     name = "aoc-env";

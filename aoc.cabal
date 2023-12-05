@@ -39,6 +39,7 @@ library
       AoC.Puzzles.Y2023D02
       AoC.Puzzles.Y2023D03
       AoC.Puzzles.Y2023D04
+      AoC.Puzzles.Y2023D05
   other-modules:
       Paths_aoc
   hs-source-dirs:
@@ -227,6 +228,7 @@ test-suite spec
       AoC.Tests.Y2023D02Spec
       AoC.Tests.Y2023D03Spec
       AoC.Tests.Y2023D04Spec
+      AoC.Tests.Y2023D05Spec
       Paths_aoc
   hs-source-dirs:
       test
