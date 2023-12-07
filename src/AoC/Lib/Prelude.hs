@@ -149,47 +149,58 @@ loadDate y d = case mkDate y d of
   (Right (MkDate year day)) -> readInput (MkDate year day)
   _ -> error "Cannot read file"
 
--- "123456" -> Just 123456
+-- >>> stringToInt "123456"
+-- Just 123456
 stringToInt :: String -> Maybe Int
 stringToInt = readMaybe
 
--- "123\n456" -> Just [123, 456]
+-- >>> stringToInts "123\n456"
+-- Just [123,456]
 stringToInts :: String -> Maybe [Int]
 stringToInts = traverse stringToInt . lines
 
--- "12\n34\n\n56\n78\n" -> Just [[12,34],[56,78]]
+-- >>> stringBlocksToInts "12\n34\n\n56\n78\n"
+-- Just [[12,34],[56,78]]
 stringBlocksToInts :: String -> Maybe [[Int]]
 stringBlocksToInts = traverse (traverse stringToInt) . splitOn [""] . lines
 
--- "12,34,56" -> Just [12,34,56]
--- "12-34" -> Just [12,34]
+-- >>> stringToIntsSepBy "," "12,34,56"
+-- >>> stringToIntsSepBy "-" "12-34"
+-- Just [12,34,56]
+-- Just [12,34]
 stringToIntsSepBy :: String -> String -> Maybe [Int]
 stringToIntsSepBy sep = traverse stringToInt . splitOn sep
 
--- "123456" -> Just [1, 2, 3, 4, 5, 6]
+-- >>> stringToDigits "123456"
+-- Just [1,2,3,4,5,6]
 stringToDigits :: String -> Maybe [Int]
 stringToDigits s =
   let xs = concatMap (map fst . (\c -> reads @Int [c])) s
    in if length xs == length s then Just xs else Nothing
 
--- '1' -> Just 1
+-- >>> charToDigit '1'
+-- Just 1
 charToDigit :: Char -> Maybe Int
 charToDigit c = case reads @Int [c] of
   [(n, "")] -> Just n
   _ -> Nothing
 
--- 0 -> [0]
--- (-123456) -> [1, 2, 3, 4, 5, 6]
+-- >>> integerToDigits 0
+-- >>> integerToDigits (-123456)
+-- [0]
+-- [1,2,3,4,5,6]
 integerToDigits :: Integer -> [Int]
 integerToDigits 0 = [0]
 integerToDigits i = reverse $ unfoldr go (abs i)
   where
     go :: Integer -> Maybe (Int, Integer)
     go 0 = Nothing
-    go n = Just (fromInteger @Int (n `mod` 10), n `div` 10)
+    go n = Just (fromInteger (n `mod` 10), n `div` 10)
 
--- [1, 2, 3, 4, 5, 6] -> Just 123456
--- [] -> Nothing
+-- >>> digitsToInteger [1, 2, 3, 4, 5, 6]
+-- >>> digitsToInteger []
+-- Just 123456
+-- Nothing
 digitsToInteger :: [Int] -> Maybe Integer
 digitsToInteger [] = Nothing
 digitsToInteger xs = Just $ foldl' (\i d -> i * 10 + toInteger d) 0 xs
@@ -232,11 +243,15 @@ outOpts =
       outputOptionsStringStyle = EscapeNonPrintable
     }
 
+-- >>> pad 5 "x"
+-- "x    "
 pad :: Int -> String -> String
 pad n s
   | length s >= n = s
   | otherwise = s <> replicate (n - length s) ' '
 
+-- >>> rpad 5 "x"
+-- "    x"
 rpad :: Int -> String -> String
 rpad n s
   | length s >= n = s
@@ -294,10 +309,14 @@ loopTillM p step x = do
   b <- p x
   if b then pure x else step x >>= loopTillM p step
 
+-- >>> (headOr 0 [], headOr 0 [1,2], lastOr 0 [], lastOr 0 [1,2])
+-- (0,1,0,2)
 headOr, lastOr :: a -> [a] -> a
 headOr = withDefault head
 lastOr = withDefault last
 
+-- >>> (minimumOr 0 [], minimumOr 0 [2,3,1], maximumOr 0 [], maximumOr 0 [2,3,1])
+-- (0,1,0,3)
 minimumOr, maximumOr :: (Foldable t, Ord a) => a -> t a -> a
 minimumOr = withDefault minimum
 maximumOr = withDefault maximum
@@ -339,49 +358,71 @@ ends s = take 1 s <> takeEnd 1 s
 enumerate :: forall a. (Bounded a, Enum a) => [a]
 enumerate = enumFrom (minBound @a)
 
--- {a, b} -> [(a, 1), (b, 2), (c, 3)] -> True
--- {a, b, c} -> [(a, 1), (b, 2)] -> False
+-- >>> hasKeys (Set.fromList ['a', 'b']) (Map.fromList [('a', 1), ('b', 2), ('c', 3)])
+-- >>> hasKeys (Set.fromList ['a', 'b', 'c']) (Map.fromList [('a', 1), ('b', 2)])
+-- True
+-- False
 hasKeys :: (Ord a) => Set a -> Map a b -> Bool
 hasKeys keys = Set.isSubsetOf keys . Map.keysSet
 
--- [2,3,1,2] -> [3,2,2,1]
+-- >>> rsort [2,3,1,2]
+-- [3,2,2,1]
 rsort :: (Ord a) => [a] -> [a]
 rsort = sortOn Down
 
--- 2 "abcd" -> Just 'c'
--- 5 "abcd" -> Nothing
+-- >>> charAt 2 "abcd"
+-- >>> charAt 5 "abcd"
+-- Just 'c'
+-- Nothing
 charAt :: Int -> String -> Maybe Char
 charAt x = fmap fst . uncons . drop x
 
--- [1, 2] -> Just (1, 2)
--- [1, 2, 3] -> Nothing
+-- >>> l2p [1, 2]
+-- >>> l2p [1, 2, 3]
+-- Just (1,2)
+-- Nothing
 l2p :: [a] -> Maybe (a, a)
 l2p [a, b] = Just (a, b)
 l2p _ = Nothing
 
--- [1, 2, 3] -> Just (1, 2, 3)
--- [1, 2] -> Nothing
+-- >>> l2p3 [1, 2, 3]
+-- >>> l2p3 [1, 2]
+-- Just (1,2,3)
+-- Nothing
 l2p3 :: [a] -> Maybe (a, a, a)
 l2p3 [a, b, c] = Just (a, b, c)
 l2p3 _ = Nothing
 
--- (1, 2, 3, 4, 5) -> [1, 2, 3, 4, 5]
+-- >>> t2l (1, 2, 3, 4, 5)
+-- [1,2,3,4,5]
 t2l :: (Each s s a a) => s -> [a]
 t2l = toListOf each
 
+-- >>> (tupleMin (1, 2, 3), tupleMax (1, 2, 3))
+-- (1,3)
 tupleMin, tupleMax :: (Ord a, Each s s a a) => s -> a
 tupleMin = minimum . t2l
 tupleMax = maximum . t2l
 
+-- >>> (tupleSum (1, 2, 3, 4), tupleProduct (1, 2, 3, 4))
+-- (10,24)
 tupleSum, tupleProduct :: (Num a, Each s s a a) => s -> a
 tupleSum = sum . t2l
 tupleProduct = product . t2l
 
+-- >>> pick 2 [1..4]
+-- >>> pick 3 [1..4]
+-- [[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]
+-- [[1,2,3],[1,2,4],[1,3,4],[2,3,4]]
 pick :: Int -> [a] -> [[a]]
 pick 0 _ = [[]]
 pick _ [] = []
 pick k (x : xs) = map (x :) (pick (k - 1) xs) <> pick k xs
 
+-- >>> slicesOf 2 [1..4]
+-- >>> slicesOf 3 [1..4]
+-- [[1,2],[2,3],[3,4]]
+-- [[1,2,3],[2,3,4]]
 slicesOf :: Int -> [a] -> [[a]]
 slicesOf n = unfoldr $ \xs ->
   let (s, t) = (take n xs, drop 1 xs)
@@ -397,6 +438,8 @@ setLookups s = mapMaybe $
 substring :: Int -> Int -> String -> String
 substring start end = take (end - start) . drop start
 
+-- >>> binToDec (decToBin 42) == 42
+-- True
 binToDec :: [Bool] -> Integer
 binToDec = foldl' (\acc x -> 2 * acc + toInteger (fromEnum x)) 0
 
@@ -421,6 +464,10 @@ chooseS = Set.foldr (\i -> (pure i <|>)) empty
 ichoose :: (Functor t, Foldable t, MonadLogic m) => t a -> m a
 ichoose = foldr interleave empty . fmap pure
 
+-- >>> unions [[1,2,3], [2,3,4], [3,4,5]]
+-- >>> intersections [[1,2,3], [2,3,4], [3,4,5]]
+-- [1,2,3,4,5]
+-- [3]
 unions, intersections :: (Eq a) => [[a]] -> [a]
 unions = foldr union []
 intersections xs = foldr intersect (unions xs) xs

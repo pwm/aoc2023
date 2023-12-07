@@ -21,10 +21,10 @@ extractNum g = read . lookups g
 
 ratio :: Grid -> [[Pos]] -> Pos -> Maybe Int
 ratio g numPs p
-  | length touchings == 2 = Just $ product $ map (extractNum g) touchings
+  | touchings <- filter ((p `elem`) . numBorders) numPs,
+    length touchings == 2 =
+      Just $ product $ map (extractNum g) touchings
   | otherwise = Nothing
-  where
-    touchings = filter (\ps -> p `elem` numBorders ps) numPs
 
 stars :: Grid -> [Pos]
 stars = Map.keys . Map.filter (== '*')

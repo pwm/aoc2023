@@ -3,23 +3,22 @@
 {-# HLINT ignore "Use tuple-section" #-}
 module AoC.Lib.Dot where
 
+import AoC.Lib.Prelude
 import Data.GraphViz
 import Data.Text.IO qualified as T
 import Data.Text.Lazy qualified as TL
-import Prelude
 
 data DotG a = DotG
   { vertices :: [a],
     edges :: [(a, a)]
   }
-  deriving stock (Show, Eq, Ord)
+  deriving stock (Show, Eq, Ord, Generic)
 
-ddg :: (Ord a, PrintDot a) => String -> DotG a -> IO ()
-ddg name =
-  T.writeFile (".local/" <> name <> ".dot")
-    . TL.toStrict
-    . printDotGraph
-    . toDotGraph
+ddd :: (Ord a, PrintDot a) => String -> DotG a -> IO ()
+ddd path = T.writeFile path . ppd
+
+ppd :: (Ord n, PrintDot n) => DotG n -> Text
+ppd = TL.toStrict . printDotGraph . toDotGraph
 
 toDotGraph :: (Ord a) => DotG a -> DotGraph a
 toDotGraph g =

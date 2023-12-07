@@ -41,7 +41,7 @@ data Colour
   | Cyan
   | White
   | Reset
-  deriving stock (Show, Eq, Ord)
+  deriving stock (Show, Eq, Ord, Bounded, Enum)
 
 colourToAnsi :: Colour -> String
 colourToAnsi = \case

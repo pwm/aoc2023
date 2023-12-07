@@ -38,14 +38,6 @@ type Parser = Parsec Void String
 ---------------------------------------------------------------------------
 -- Space consuming versions
 
--- Note: hspace1 seem to work better for AoC type parsing,
--- ie. it's nicer to have explicit newlines
-sc :: Parser ()
-sc = Lexer.space hspace1 empty empty
-
-lexeme :: Parser a -> Parser a
-lexeme = Lexer.lexeme sc
-
 -- >>> parseMaybe (strP "abc") "abc  "
 -- Just "abc"
 strP :: String -> Parser String
@@ -73,14 +65,14 @@ doubleQuotes = "\"" `inside` "\""
 inside :: String -> String -> Parser a -> Parser a
 inside open close = (strP open <* sc) `between` (sc *> strP close)
 
+lexeme :: Parser a -> Parser a
+lexeme = Lexer.lexeme sc
+
+sc :: Parser ()
+sc = Lexer.space hspace1 empty empty
+
 ---------------------------------------------------------------------------
 -- Non-space consuming versions
-
-sc0 :: Parser ()
-sc0 = Lexer.space empty empty empty
-
-lexeme0 :: Parser a -> Parser a
-lexeme0 = Lexer.lexeme sc0
 
 -- >>> parseMaybe (strP0 "abc") "abc"
 -- Just "abc"
@@ -108,6 +100,12 @@ doubleQuotes0 = "\"" `inside0` "\""
 
 inside0 :: String -> String -> Parser a -> Parser a
 inside0 open close = (strP0 open <* sc) `between` (sc *> strP0 close)
+
+lexeme0 :: Parser a -> Parser a
+lexeme0 = Lexer.lexeme sc0
+
+sc0 :: Parser ()
+sc0 = Lexer.space empty empty empty
 
 ---------------------------------------------------------------------------
 -- Helpers
