@@ -7,24 +7,8 @@ import Data.PQueue.Prio.Min qualified as MinPQueue
 import Data.Sequence qualified as Seq
 import Data.Set qualified as Set
 
-topSort :: forall n. (Ord n) => (n -> [n]) -> [n] -> [n]
-topSort nexts =
-  map snd
-    . sortOn (Down . fst)
-    . flip evalState (mempty, 0)
-    . fmap mconcat
-    . traverse go
-  where
-    go :: n -> State (Set n, Int) [(Int, n)]
-    go node = do
-      seen <- use _1
-      if Set.member node seen
-        then pure []
-        else do
-          _1 %= Set.insert node
-          res <- mconcat <$> traverse go (nexts node)
-          n <- _2 += 1 >> use _2
-          pure $ (n, node) : res
+---------------------------------------------------------------------------
+-- DFS
 
 -- Explore all reachable nodes from a node
 dfs :: (Ord n) => (n -> [n]) -> n -> [n]
@@ -66,7 +50,8 @@ dfsPaths nexts = dfsPathsTo (null . nexts) nexts -- does not handle cycles (ie. 
 dfsSPTo :: (Ord n) => (n -> Bool) -> (n -> [n]) -> n -> [n]
 dfsSPTo found nexts = minimumBy (comparing length) . dfsPathsTo found nexts
 
---
+---------------------------------------------------------------------------
+-- BFS
 
 bfs :: (Ord n) => (n -> [n]) -> n -> [(n, Int)]
 bfs = bfsTill (const False)
@@ -93,7 +78,8 @@ bfsSPT nexts = buildSPT . bfsWithParents nexts (const False)
 bfsWithParents :: (Ord n) => (n -> [n]) -> (n -> Bool) -> n -> [(n, (Int, Maybe n))]
 bfsWithParents nexts = dijkstraWithParents (map (,1) . nexts)
 
---
+-----------------------------------------------------------------------------
+-- Dijkstra
 
 dijkstra :: (Ord n) => (n -> [(n, Int)]) -> n -> [(n, Int)]
 dijkstra = dijkstraTill (const False)
@@ -113,7 +99,8 @@ dijkstraSPT nexts = buildSPT . dijkstraWithParents nexts (const False)
 dijkstraWithParents :: (Ord n) => (n -> [(n, Int)]) -> (n -> Bool) -> n -> [(n, (Int, Maybe n))]
 dijkstraWithParents nexts = astarWithParents (map (second (,0)) . nexts)
 
---
+-----------------------------------------------------------------------------
+-- A*
 
 astar :: (Ord n) => (n -> [(n, (Int, Int))]) -> n -> [(n, Int)]
 astar = astarTill (const False)
@@ -147,6 +134,9 @@ astarWithParents nexts found from = go mempty (MinPQueue.singleton 0 (from, 0, N
             let addNode :: MinPQueue Int (n, Int, Maybe n) -> (n, (Int, Int)) -> MinPQueue Int (n, Int, Maybe n)
                 addNode mpq (n, (stepCost, h)) = MinPQueue.insert (costWithH + stepCost + h) (n, cost + stepCost, Just node) mpq
              in (node, (cost, parent)) : go (Set.insert node seen) (foldl' addNode unseen' (nexts node))
+
+-----------------------------------------------------------------------------
+-- Utils
 
 -- Builds shortest path from root (identified by Nothing as its parent) to dest
 buildSP :: forall n. (Ord n) => n -> [(n, (Int, Maybe n))] -> [(n, Int)]

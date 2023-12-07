@@ -23,6 +23,7 @@ module AoC.Lib.Prelude
     digitsToInt,
     pp,
     ppw,
+    ppw120,
     ppw160,
     ppw200,
     pps,
@@ -205,7 +206,8 @@ pp = pPrintOpt CheckColorTty outOpts
 ppw :: (Show a) => Int -> a -> IO ()
 ppw width = pPrintOpt CheckColorTty (outOpts & #outputOptionsPageWidth .~ width)
 
-ppw160, ppw200 :: (Show a) => a -> IO ()
+ppw120, ppw160, ppw200 :: (Show a) => a -> IO ()
+ppw120 = ppw 120
 ppw160 = ppw 160
 ppw200 = ppw 200
 

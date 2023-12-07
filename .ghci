@@ -3,6 +3,7 @@
 import AoC.Lib.Prelude
 
 :def pp \_ -> pure $ ":set -interactive-print=Text.Pretty.Simple.pPrint"
+:def pp120 \_ -> pure $ ":set -interactive-print=ppw120"
 :def pp160 \_ -> pure $ ":set -interactive-print=ppw160"
 :def pp200 \_ -> pure $ ":set -interactive-print=ppw200"
 :def nopp \_ -> pure $ ":set -interactive-print=print"
