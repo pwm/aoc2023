@@ -75,6 +75,8 @@ module AoC.Lib.Prelude
     binToDec,
     decToBin,
     sqrtInt,
+    gcds,
+    lcms,
     choose,
     chooseS,
     ichoose,
@@ -453,6 +455,12 @@ decToBin n =
 
 sqrtInt :: Int -> Int
 sqrtInt = floor @Double . sqrt . fromIntegral
+
+-- >>> (gcds [6, 12, 16], lcms [6, 12, 16])
+-- (2,48)
+gcds, lcms :: [Int] -> Int
+gcds = foldl' gcd 0
+lcms = foldl' lcm 1
 
 choose :: (Traversable t, Alternative m) => t a -> m a
 choose = asum . fmap pure
