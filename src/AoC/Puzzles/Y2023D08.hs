@@ -12,7 +12,7 @@ solveA (dirs, graph) = length $ walk (dirs, graph) (== "ZZZ") "AAA"
 
 solveB :: ([Dir], Graph) -> Int
 solveB (dirs, graph) =
-  let aStarts = Map.keys $ Map.filterWithKey (\n _ -> endA n) graph
+  let aStarts = Map.keys $ filterKey endA graph
    in lcms $ map (length . walk (dirs, graph) endZ) aStarts
 
 endA, endZ :: String -> Bool

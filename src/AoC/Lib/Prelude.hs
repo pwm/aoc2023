@@ -64,6 +64,7 @@ module AoC.Lib.Prelude
     pick,
     slicesOf,
     lookups,
+    filterKey,
     setLookups,
     compose,
     composeM,
@@ -432,6 +433,9 @@ slicesOf n = unfoldr $ \xs ->
 
 lookups :: (Ord k) => Map k v -> [k] -> [v]
 lookups m = mapMaybe (m !?)
+
+filterKey :: (k -> Bool) -> Map k a -> Map k a
+filterKey f = Map.filterWithKey (curry (f . fst))
 
 setLookups :: (Ord v) => Set v -> [v] -> [v]
 setLookups s = mapMaybe $
