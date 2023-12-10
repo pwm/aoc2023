@@ -25,6 +25,10 @@ move4 = moveWith d2p4
 path4 :: Pos -> [Dir4] -> [Pos]
 path4 = pathWith d2p4
 
+clock4, anticlock4 :: Dir4 -> Dir4
+clock4 = \case U -> R; R -> D; D -> L; L -> U
+anticlock4 = \case U -> L; L -> D; D -> R; R -> U
+
 --
 
 data Dir8 = N | NE | E | SE | S | SW | W | NW
