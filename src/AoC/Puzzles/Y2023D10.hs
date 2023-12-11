@@ -4,80 +4,69 @@ import AoC.Lib.Graph
 import AoC.Lib.Grid
 import AoC.Lib.Parser
 import AoC.Lib.Prelude
-import Data.Map.Merge.Strict qualified as Map
 import Data.Map.Strict qualified as Map
 import Data.Set qualified as Set
-
--- import Data.Functor.Identity
 
 parse :: String -> Maybe Grid
 parse = parseGrid parseCell
 
--- 6838
 solveA :: Grid -> Int
-solveA = const 0 -- (`div` 2) . length . walk
+solveA g = (`div` 2) . length . fstOf3 $ walk False (fst $ startDirs g) g
 
--- 451
-solveB :: Grid -> ()
-solveB _ = ()
+solveB :: Grid -> Int
+solveB g =
+  let (dir1, dir2) = startDirs g
+      (loop, _, _) = walk False dir1 g -- walk once to find the loop
+      g' = Map.restrictKeys g loop `Map.union` Map.map (const Dot) g -- remove unused pipes
+      -- walk the loop again both directions and check clockwise/anticlockwise
+      (_, clock1, anticlock1) = walk True dir1 g'
+      (_, anticlock2, clock2) = walk True dir2 g'
+   in -- the minimum of the two should be the sum of inner spaces
+      Set.size (clock1 `Set.union` clock2) `min` Set.size (anticlock1 `Set.union` anticlock2)
 
--- putStrLn $ ppg $ f4 ss
-f4 :: String -> Grid
-f4 s =
-  let g = pr s
-      (ps, _) = walk clockwise g D
-      g' = f1 ps g
-      (_, rs1) = walk clockwise g' D
-      (_, rs2) = walk anticlockwise g' R
-   in f2 (Set.toList $ Set.union rs1 rs2) g'
-
--- let g = pr s3; (ps, rs) = walk g in putStrLn (ppg $ f2 (Set.toList rs) $ f1 ps g)
-f2 :: [Pos] -> Grid -> Grid
-f2 ps g = g'
+walk :: Bool -> Dir4 -> Grid -> (Set Pos, Set Pos, Set Pos)
+walk checkNeighbours sDir g = execState (go (start g) sDir) (mempty, mempty, mempty)
   where
-    gWith = Map.restrictKeys g (Set.fromList ps)
-    g' = Map.merge Map.preserveMissing Map.preserveMissing (Map.zipWithMatched (\_ _ _ -> Start)) g gWith
-
--- let g = pr s3; (ps, rs) = walk g in putStrLn (ppg $ f1 ps g)
-f1 :: [Pos] -> Grid -> Grid
-f1 ps g = g'
-  where
-    gWith = Map.restrictKeys g (Set.fromList ps)
-    gWithout = Map.map (const Dot) $ Map.withoutKeys g (Set.fromList ps)
-    g' = Map.merge Map.preserveMissing Map.preserveMissing (Map.zipWithMatched (\_ _ _ -> Dot)) gWith gWithout
-
--- let g = pr s3 in walk g
-walk :: (Pos -> Dir4 -> Pos) -> Grid -> Dir4 -> ([Pos], Set Pos)
-walk turn g0 sDir = snd $ execState (go (start g0, sDir)) (g0, ([], mempty))
-  where
-    go :: (Pos, Dir4) -> State (Grid, ([Pos], Set Pos)) ()
-    go (p, d) = do
-      (g, (ps, rs)) <- get
-      if not (null ps) && g ! p == Start
+    go :: Pos -> Dir4 -> State (Set Pos, Set Pos, Set Pos) ()
+    go p d = do
+      (loop, cps, acps) <- get
+      if not (null loop) && g ! p == Start
         then pure ()
         else do
-          let (p', d') = step1 g (p, d)
-          (_2 . _1) %= (p' :)
-          let cw1 = turn p' d'
-          when (g !? cw1 == Just Dot) $ do
-            let xs = map fst $ bfs (filter (\p1 -> g !? p1 == Just Dot && Set.notMember p1 rs) . neighbours4 g) cw1
-            (_2 . _2) %= Set.union (Set.fromList xs)
-          go (p', d')
+          let (p', d') = stepDir p (g ! p) d
+          _1 %= Set.insert p'
+          -- check clockwise and anticlockwise dots and floodfill them
+          when checkNeighbours $ do
+            let cp = step4 p' (clock4 d')
+            when (g !? cp == Just Dot) $ do
+              let ps = fst <$> bfs (filter (\p1 -> g !? p1 == Just Dot && Set.notMember p1 cps) . neighbours4 g) cp
+              _2 %= Set.union (Set.fromList ps)
+            let acp = step4 p' (anticlock4 d')
+            when (g !? acp == Just Dot) $ do
+              let ps = fst <$> bfs (filter (\p1 -> g !? p1 == Just Dot && Set.notMember p1 acps) . neighbours4 g) acp
+              _3 %= Set.union (Set.fromList ps)
+          go p' d'
 
-step1 :: Grid -> (Pos, Dir4) -> (Pos, Dir4)
-step1 g (p, d) = case g ! p of
-  Start -> (step4 p d, d)
-  Hor -> (step4 p d, d)
-  Ver -> (step4 p d, d)
-  UR -> let d' = case d of D -> R; _ -> U in (step4 p d', d')
-  UL -> let d' = case d of D -> L; _ -> U in (step4 p d', d')
-  DL -> let d' = case d of U -> L; _ -> D in (step4 p d', d')
-  DR -> let d' = case d of U -> R; _ -> D in (step4 p d', d')
-  Dot -> error "nooooo"
+stepDir :: Pos -> Cell -> Dir4 -> (Pos, Dir4)
+stepDir p c d =
+  let d' = case c of
+        UR -> case d of D -> R; _ -> U
+        UL -> case d of D -> L; _ -> U
+        DL -> case d of U -> L; _ -> D
+        DR -> case d of U -> R; _ -> D
+        _ -> d
+   in (step4 p d', d')
 
-clockwise, anticlockwise :: Pos -> Dir4 -> Pos
-clockwise p = step4 p . clock4
-anticlockwise p = step4 p . anticlock4
+startDirs :: Grid -> (Dir4, Dir4)
+startDirs g | p <- start g =
+  case idStart p of UR -> (U, R); UL -> (U, L); DL -> (D, L); _ -> (D, R)
+  where
+    idStart :: Pos -> Cell
+    idStart p
+      | g !? step4 p U `elem` (Just <$> [Ver, DR, DL]) && g !? step4 p R `elem` (Just <$> [Hor, UL, DL]) = UR
+      | g !? step4 p U `elem` (Just <$> [Ver, DR, DL]) && g !? step4 p L `elem` (Just <$> [Hor, DR, UR]) = UL
+      | g !? step4 p D `elem` (Just <$> [Ver, UR, UL]) && g !? step4 p L `elem` (Just <$> [Hor, UR, DR]) = DL
+      | otherwise = DR
 
 start :: Grid -> Pos
 start = head . Map.keys . Map.filter (== Start)
@@ -98,89 +87,3 @@ parseCell = \case
   '.' -> Just Dot
   'S' -> Just Start
   _ -> Nothing
-
-ppCell :: Cell -> String
-ppCell = \case
-  Hor -> "─"
-  Ver -> "│"
-  UR -> "└"
-  UL -> "┘"
-  DL -> "┐"
-  DR -> "┌"
-  Dot -> "."
-  Start -> "S"
-
-ppg :: GridOf Cell -> String
-ppg = printGrid ppCell
-
----------------------------------------------------------------------------
--- Test data
-
-pr :: String -> Grid
-pr = fromJust . parse
-
-s0, s1, s2, s3, s4 :: String
-s0 =
-  unpack
-    [trimming|
--L|F7
-7S-7|
-L|7||
--L-J|
-L|-JF
-|]
-s1 =
-  unpack
-    [trimming|
-7-F7-
-.FJ|7
-SJLL7
-|F--J
-LJ.LJ
-|]
-s2 =
-  unpack
-    [trimming|
-...........
-.S-------7.
-.|F-----7|.
-.||.....||.
-.||.....||.
-.|L-7.F-J|.
-.|..|.|..|.
-.L--J.L--J.
-...........
-|]
-s3 =
-  unpack
-    [trimming|
-.F----7F7F7F7F-7....
-.|F--7||||||||FJ....
-.||.FJ||||||||L7....
-FJL7L7LJLJ||LJ.L-7..
-L--J.L7...LJS7F-7L7.
-....F-J..F7FJ|L7L7L7
-....L7.F7||L7|.L7L7|
-.....|FJLJ|FJ|F7|.LJ
-....FJL-7.||.||||...
-....L---J.LJ.LJLJ...
-|]
-s4 =
-  unpack
-    [trimming|
-FF7FSF7F7F7F7F7F---7
-L|LJ||||||||||||F--J
-FL-7LJLJ||||||LJL-77
-F--JF--7||LJLJ7F7FJ-
-L---JF-JLJ.||-FJLJJ7
-|F|F-JF---7F7-L7L|7|
-|FFJF7L7F-JF7|JL---7
-7-L-JL7||F7|L7F-7F7|
-L.L7LFJ|||||FJL7||LJ
-L7JLJL-JLJLJL--JLJ.L
-|]
-
--- load actual input from the downloaded file
-ss :: String
-ss = unsafePerformIO $ loadDate 2023 10
-{-# NOINLINE ss #-}
