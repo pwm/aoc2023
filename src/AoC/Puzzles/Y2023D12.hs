@@ -38,7 +38,6 @@ s0 =
 ?###???????? 3,2,1
 |]
 
--- load actual input from the downloaded file
 ss :: String
 ss = unsafePerformIO $ loadDate 2023 12
 {-# NOINLINE ss #-}

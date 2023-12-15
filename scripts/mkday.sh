@@ -22,9 +22,9 @@ src_content=$(
   cat <<-EOF
 module AoC.Puzzles.Y${year}D${day} where
 
-import AoC.Lib.Prelude
-import AoC.Lib.Parser
 import AoC.Lib.Grid
+import AoC.Lib.Parser
+import AoC.Lib.Prelude
 import Data.Map.Strict qualified as Map
 import Data.Set qualified as Set
 
@@ -50,7 +50,6 @@ s0 =
 -- Copy example here
 |]
 
--- load actual input from the downloaded file
 ss :: String
 ss = unsafePerformIO $ loadDate ${year} ${day}
 {-# NOINLINE ss #-}
