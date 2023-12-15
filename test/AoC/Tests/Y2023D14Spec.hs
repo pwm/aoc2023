@@ -11,4 +11,4 @@ spec =
     (mkDate 2023 14)
     parse
     (solveA, 106378)
-    (solveB, ())
+    (solveB, 90795)
