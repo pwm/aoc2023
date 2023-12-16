@@ -19,6 +19,7 @@ import AoC.Puzzles.Y2023D12 qualified as Y2023D12
 import AoC.Puzzles.Y2023D13 qualified as Y2023D13
 import AoC.Puzzles.Y2023D14 qualified as Y2023D14
 import AoC.Puzzles.Y2023D15 qualified as Y2023D15
+import AoC.Puzzles.Y2023D16 qualified as Y2023D16
 import Data.Map.Strict qualified as Map
 
 aoc :: IO ()
@@ -44,5 +45,6 @@ solutions =
       ((2023, 12), mkSolverFor Y2023D12.parse Y2023D12.solveA Y2023D12.solveB),
       ((2023, 13), mkSolverFor Y2023D13.parse Y2023D13.solveA Y2023D13.solveB),
       ((2023, 14), mkSolverFor Y2023D14.parse Y2023D14.solveA Y2023D14.solveB),
-      ((2023, 15), mkSolverFor Y2023D15.parse Y2023D15.solveA Y2023D15.solveB)
+      ((2023, 15), mkSolverFor Y2023D15.parse Y2023D15.solveA Y2023D15.solveB),
+      ((2023, 16), mkSolverFor Y2023D16.parse Y2023D16.solveA Y2023D16.solveB)
     ]

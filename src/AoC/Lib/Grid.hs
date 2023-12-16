@@ -134,13 +134,8 @@ mkRect (upLeftX, upLeftY) (downRightX, downRightY) =
 mkSquare :: Int -> [Pos]
 mkSquare n = mkRect (0, 0) (n - 1, n - 1)
 
-bounds :: [Pos] -> (Pos, Pos)
-bounds xs =
-  let minX = fst $ minimumBy (comparing fst) xs
-      maxX = fst $ maximumBy (comparing fst) xs
-      minY = snd $ minimumBy (comparing snd) xs
-      maxY = snd $ maximumBy (comparing snd) xs
-   in ((minX, minY), (maxX, maxY))
+bounds :: GridOf a -> (Pos, Pos)
+bounds g = (fst (Map.findMin g), fst (Map.findMax g))
 
 --
 
