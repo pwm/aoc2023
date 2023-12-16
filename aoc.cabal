@@ -126,6 +126,7 @@ library
     , mtl
     , neat-interpolation
     , optparse-applicative
+    , parallel
     , parser-combinators
     , pqueue
     , pretty-simple
@@ -216,6 +217,7 @@ executable aoc
     , mtl
     , neat-interpolation
     , optparse-applicative
+    , parallel
     , parser-combinators
     , pqueue
     , pretty-simple
@@ -327,6 +329,7 @@ test-suite spec
     , mtl
     , neat-interpolation
     , optparse-applicative
+    , parallel
     , parser-combinators
     , pqueue
     , pretty-simple

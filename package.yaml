@@ -29,6 +29,7 @@ dependencies:
   - mtl
   - neat-interpolation
   - optparse-applicative
+  - parallel
   - parser-combinators
   - pqueue
   - pretty-simple

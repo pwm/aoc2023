@@ -3,6 +3,7 @@ module AoC.Puzzles.Y2023D16 where
 import AoC.Lib.Grid
 import AoC.Lib.Parser
 import AoC.Lib.Prelude
+import Control.Parallel.Strategies
 import Data.Map.Strict qualified as Map
 import Data.Set qualified as Set
 
@@ -13,7 +14,7 @@ solveA :: Grid -> Int
 solveA = run ((0, 0), R)
 
 solveB :: Grid -> Int
-solveB g = maximum $ map (`run` g) (frame g)
+solveB g = maximum $ parMap rpar (`run` g) (frame g)
 
 type Grid = GridOf Cell
 
