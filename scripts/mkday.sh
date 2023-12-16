@@ -22,6 +22,7 @@ src_content=$(
   cat <<-EOF
 module AoC.Puzzles.Y${year}D${day} where
 
+import AoC.Lib.Graph
 import AoC.Lib.Grid
 import AoC.Lib.Parser
 import AoC.Lib.Prelude
@@ -38,7 +39,7 @@ solveB :: a -> ()
 solveB _ = ()
 
 ---------------------------------------------------------------------------
--- Test data
+-- Dev
 
 p :: String -> ()
 p = fromJust . parse

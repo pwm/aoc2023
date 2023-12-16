@@ -63,6 +63,13 @@ aoc fetch --year 2023 --day 01
 aoc solve --year 2023 --day 01
 ```
 
+### Perf
+
+```
+hyperfine --warmup 3 -- 'scripts/solve.sh 2023 01'
+hyperfine --warmup 3 -- 'aoc solve -y 2023 -d 01'
+```
+
 ### CI with Cachix
 
 Configure `CACHIX_SIGNING_KEY` as a repository secret (see: https://nix.dev/tutorials/continuous-integration-github-actions)

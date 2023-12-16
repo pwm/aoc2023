@@ -26,7 +26,7 @@ col = length . head
 {-
 start from col 1 to length - 2
   expand left-right till reaching the end on one side
-  
+
 -}
 
 ---------------------------------------------------------------------------

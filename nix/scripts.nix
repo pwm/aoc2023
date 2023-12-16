@@ -11,6 +11,6 @@
   '';
   aoc = pkgs.writeShellScriptBin "aoc" ''
     set -euo pipefail
-    result/bin/aoc "$@"
+    result/bin/aoc +RTS -N -T -RTS -- "$@"
   '';
 in [logo build aoc]

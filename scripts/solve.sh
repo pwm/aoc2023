@@ -13,11 +13,11 @@ if [[ "$(rg --count "^profiling:\s*True" cabal.project)" == 1 ]]; then
 fi
 
 if [[ $# -eq 2 ]]; then
-  cabal run aoc -- +RTS $prof_flag -T -RTS solve --year "$1" --day "$2"
+  cabal run aoc -- +RTS -N -T $prof_flag -RTS solve --year "$1" --day "$2"
 elif [[ $# -eq 1 ]]; then
-  cabal run aoc -- +RTS $prof_flag -RTS solve --year "$year" --day "$1"
+  cabal run aoc -- +RTS -N -T $prof_flag -RTS solve --year "$year" --day "$1"
 else
-  cabal run aoc -- +RTS $prof_flag -RTS solve --year "$year" --day "$day"
+  cabal run aoc -- +RTS -N -T $prof_flag -RTS solve --year "$year" --day "$day"
 fi
 
 # Generate various profiling graphs
