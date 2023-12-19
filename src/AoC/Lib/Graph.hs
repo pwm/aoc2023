@@ -57,14 +57,14 @@ bfs :: (Ord n) => (n -> [n]) -> n -> [(n, Int)]
 bfs = bfsTill (const False)
 
 bfsTill :: forall n. (Ord n) => (n -> Bool) -> (n -> [n]) -> n -> [(n, Int)]
-bfsTill found next from = go mempty (Seq.fromList [(from, 0)])
+bfsTill found nexts from = go mempty (Seq.fromList [(from, 0)])
   where
     go :: Set n -> Seq.Seq (n, Int) -> [(n, Int)]
     go _ Seq.Empty = []
     go seen ((node, d) :<| unseen)
       | found node = [(node, d)]
       | Set.member node seen = go seen unseen
-      | otherwise = (node, d) : go (Set.insert node seen) (unseen <> Seq.fromList ((,d + 1) <$> next node))
+      | otherwise = (node, d) : go (Set.insert node seen) (unseen <> Seq.fromList ((,d + 1) <$> nexts node))
 
 -- Shortest path from root to dest
 bfsSPTo :: (Ord n) => (n -> [n]) -> n -> n -> [(n, Int)]

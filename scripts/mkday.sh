@@ -39,7 +39,7 @@ solveB :: a -> ()
 solveB _ = ()
 
 ---------------------------------------------------------------------------
--- Dev
+-- https://adventofcode.com/${year}/day/${day}
 
 p :: String -> ()
 p = fromJust . parse

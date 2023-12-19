@@ -121,11 +121,20 @@ neighbours9 m = filter (`Map.member` m) . adj9
 lookupNs4 :: Pos -> GridOf a -> [a]
 lookupNs4 p m = lookups m (adj4 p)
 
+lookupKNs4 :: Pos -> GridOf a -> [(Pos, a)]
+lookupKNs4 p m = lookupsKey m (adj4 p)
+
 lookupNs8 :: Pos -> GridOf a -> [a]
 lookupNs8 p m = lookups m (adj8 p)
 
+lookupKNs8 :: Pos -> GridOf a -> [(Pos, a)]
+lookupKNs8 p m = lookupsKey m (adj8 p)
+
 lookupNs9 :: Pos -> GridOf a -> [a]
 lookupNs9 p m = lookups m (adj9 p)
+
+lookupKNs9 :: Pos -> GridOf a -> [(Pos, a)]
+lookupKNs9 p m = lookupsKey m (adj9 p)
 
 mkRect :: Pos -> Pos -> [Pos]
 mkRect (upLeftX, upLeftY) (downRightX, downRightY) =

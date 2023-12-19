@@ -64,6 +64,7 @@ module AoC.Lib.Prelude
     pick,
     slicesOf,
     lookups,
+    lookupsKey,
     filterKey,
     setLookups,
     compose,
@@ -431,16 +432,29 @@ slicesOf n = unfoldr $ \xs ->
   let (s, t) = (take n xs, drop 1 xs)
    in if length s >= n then Just (s, t) else Nothing
 
+-- >>> lookups (Map.fromList [(1,'a'),(2,'b'),(3,'c'),(4,'d'),(5,'e')]) [1,3,4]
+-- "acd"
 lookups :: (Ord k) => Map k v -> [k] -> [v]
 lookups m = mapMaybe (m !?)
 
+-- >>> lookupsKey (Map.fromList [(1,'a'),(2,'b'),(3,'c'),(4,'d'),(5,'e')]) [1,3,4]
+-- [(1,'a'),(3,'c'),(4,'d')]
+lookupsKey :: (Ord k) => Map k v -> [k] -> [(k, v)]
+lookupsKey m = mapMaybe (\k -> (k,) <$> m !? k)
+
+-- >>> filterKey (<3) $ Map.fromList [(1,'a'),(2,'b'),(3,'c'),(4,'d'),(5,'e')]
+-- fromList [(1,'a'),(2,'b')]
 filterKey :: (k -> Bool) -> Map k a -> Map k a
 filterKey f = Map.filterWithKey (curry (f . fst))
 
+-- >>> setLookups (Set.fromList [1,2,3,4,5]) [1,3,4]
+-- [1,3,4]
 setLookups :: (Ord v) => Set v -> [v] -> [v]
 setLookups s = mapMaybe $
   \v -> if Set.member v s then Just v else Nothing
 
+-- >>> substring 1 3 "abcd"
+-- "bc"
 substring :: Int -> Int -> String -> String
 substring start end = take (end - start) . drop start
 
@@ -457,6 +471,8 @@ decToBin n =
       go k rs = go (k `div` 2) (k `mod` 2 : rs)
    in map (== 1) (go n [])
 
+-- >>> (sqrtInt 8, sqrtInt 10)
+-- (2,3)
 sqrtInt :: Int -> Int
 sqrtInt = floor @Double . sqrt . fromIntegral
 
