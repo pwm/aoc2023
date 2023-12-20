@@ -35,7 +35,6 @@ module AoC.Lib.Prelude
     ddf,
     ocr,
     fixpoint,
-    fixpointL,
     fixpointM,
     loopTill,
     loopTillM,
@@ -71,7 +70,6 @@ module AoC.Lib.Prelude
     composeM,
     times,
     timesAcc,
-    timesL,
     timesM,
     substring,
     binToDec,
@@ -189,22 +187,17 @@ charToDigit c = case reads @Int [c] of
   [(n, "")] -> Just n
   _ -> Nothing
 
--- >>> integerToDigits 0
--- >>> integerToDigits (-123456)
--- [0]
--- [1,2,3,4,5,6]
+-- >>> (integerToDigits 0, integerToDigits (-123456))
+-- ([0],[1,2,3,4,5,6])
 integerToDigits :: Integer -> [Int]
-integerToDigits 0 = [0]
 integerToDigits i = reverse $ unfoldr go (abs i)
   where
     go :: Integer -> Maybe (Int, Integer)
     go 0 = Nothing
     go n = Just (fromInteger (n `mod` 10), n `div` 10)
 
--- >>> digitsToInteger [1, 2, 3, 4, 5, 6]
--- >>> digitsToInteger []
--- Just 123456
--- Nothing
+-- >>> (digitsToInteger [1, 2, 3, 4, 5, 6], digitsToInteger [])
+-- (Just 123456,Nothing)
 digitsToInteger :: [Int] -> Maybe Integer
 digitsToInteger [] = Nothing
 digitsToInteger xs = Just $ foldl' (\i d -> i * 10 + toInteger d) 0 xs
@@ -247,6 +240,17 @@ outOpts =
       outputOptionsStringStyle = EscapeNonPrintable
     }
 
+withIO :: IO a -> b -> b
+withIO a b = let !_ = unsafePerformIO a in b
+
+ddf :: (Applicative f, Show a) => FilePath -> a -> f ()
+ddf file a = unsafePerformIO $ do
+  !_ <- appendFile file (show a <> "\n")
+  pure (pure ())
+
+ocr :: String -> String
+ocr = fromMaybe "" . asciiMapToLetters (Set.singleton '#')
+
 -- >>> pad 5 "x"
 -- "x    "
 pad :: Int -> String -> String
@@ -261,53 +265,48 @@ rpad n s
   | length s >= n = s
   | otherwise = replicate (n - length s) ' ' <> s
 
-withIO :: IO a -> b -> b
-withIO a b = let !_ = unsafePerformIO a in b
-
-ddf :: (Applicative f, Show a) => FilePath -> a -> f ()
-ddf file a = unsafePerformIO $ do
-  !_ <- appendFile file (show a <> "\n")
-  pure (pure ())
-
-ocr :: String -> String
-ocr = fromMaybe "" . asciiMapToLetters (Set.singleton '#')
-
--- strict
+-- >>> fixpoint (drop 1) [1..10]
+-- []
 fixpoint :: (Eq a) => (a -> a) -> a -> a
 fixpoint f x | y <- f x = if y `seq` x == y then y else fixpoint f y
-
--- lazy
-fixpointL :: (Eq a) => (a -> a) -> a -> a
-fixpointL f x = if x == f x then x else fixpoint f (f x)
 
 fixpointM :: (Monad m, Eq a) => (a -> m a) -> a -> m a
 fixpointM f x = do
   y <- f x
   if x == y then pure y else fixpointM f y
 
+-- >>> compose [(* 2), (+ 1), (* 3)] 1
+-- 8
 compose :: (Foldable t) => t (b -> b) -> b -> b
 compose = foldr (.) id
 
 composeM :: (Foldable t, Monad m) => t (b -> m b) -> b -> m b
 composeM = foldr (<=<) pure
 
--- strict
+-- >>> times 10 (+ 1) 0
+-- 10
 times :: Int -> (b -> b) -> b -> b
 times n f s = foldl' (\x _ -> f x) s (replicate n ())
 
+-- >>> timesAcc 10 (+ 1) 0
+-- [0,1,2,3,4,5,6,7,8,9,10]
 timesAcc :: Int -> (b -> b) -> b -> [b]
 timesAcc n f s = scanl' (\x _ -> f x) s (replicate n ())
 
--- lazy
-timesL :: Int -> (b -> b) -> b -> b
-timesL n = compose . replicate n
-
+-- >>> runIdentity $ timesM 10 (pure . (+ 1)) 0
+-- 10
 timesM :: (Monad m) => Int -> (b -> m b) -> b -> m b
 timesM n = composeM . replicate n
 
+-- >>> loopTill (== 10) (+ 1) 0
+-- 10
 loopTill :: (a -> Bool) -> (a -> a) -> a -> a
-loopTill p step x = if p x then x else loopTill p step (step x)
+loopTill p step x
+  | True <- p x = x
+  | otherwise = loopTill p step (step x)
 
+-- >>> runIdentity $ loopTillM (pure . (== 10)) (pure . (+ 1)) 0
+-- 10
 loopTillM :: (Monad m) => (a -> m Bool) -> (a -> m a) -> a -> m a
 loopTillM p step x = do
   b <- p x
@@ -381,18 +380,14 @@ rsort = sortOn Down
 charAt :: Int -> String -> Maybe Char
 charAt x = fmap fst . uncons . drop x
 
--- >>> l2p [1, 2]
--- >>> l2p [1, 2, 3]
--- Just (1,2)
--- Nothing
+-- >>> (l2p [1, 2], l2p [1, 2, 3])
+-- (Just (1,2),Nothing)
 l2p :: [a] -> Maybe (a, a)
 l2p [a, b] = Just (a, b)
 l2p _ = Nothing
 
--- >>> l2p3 [1, 2, 3]
--- >>> l2p3 [1, 2]
--- Just (1,2,3)
--- Nothing
+-- >>> (l2p3 [1, 2, 3], l2p3 [1, 2])
+-- (Just (1,2,3),Nothing)
 l2p3 :: [a] -> Maybe (a, a, a)
 l2p3 [a, b, c] = Just (a, b, c)
 l2p3 _ = Nothing

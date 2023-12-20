@@ -74,8 +74,8 @@ sc = Lexer.space hspace1 empty empty
 ---------------------------------------------------------------------------
 -- Non-space consuming versions
 
--- >>> parseMaybe (strP0 "abc") "abc"
--- Just "abc"
+-- >>> (parseMaybe (strP0 "abc") "abc", parseMaybe (strP0 "abc") "abc ")
+-- (Just "abc",Nothing)
 strP0 :: String -> Parser String
 strP0 = lexeme0 . string
 

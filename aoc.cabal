@@ -54,6 +54,8 @@ library
       AoC.Puzzles.Y2023D17
       AoC.Puzzles.Y2023D18
       AoC.Puzzles.Y2023D19
+      AoC.Puzzles.Y2023D20
+      AoC.Puzzles.Y2023D21
   other-modules:
       Paths_aoc
   hs-source-dirs:
@@ -108,6 +110,7 @@ library
   ghc-options: -Weverything -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missed-specialisations -Wno-all-missed-specialisations -Wno-unsafe -Wno-safe -Wno-missing-local-signatures -Wno-monomorphism-restriction -Wno-missing-export-lists -Wno-missing-home-modules -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unused-packages -Wno-implicit-prelude -Wno-missing-kind-signatures -Wno-unticked-promoted-constructors
   build-depends:
       advent-of-code-ocr
+    , arithmoi
     , base >=4.7 && <5
     , bytestring
     , containers
@@ -199,6 +202,7 @@ executable aoc
   build-depends:
       advent-of-code-ocr
     , aoc
+    , arithmoi
     , base >=4.7 && <5
     , bytestring
     , containers
@@ -259,6 +263,8 @@ test-suite spec
       AoC.Tests.Y2023D17Spec
       AoC.Tests.Y2023D18Spec
       AoC.Tests.Y2023D19Spec
+      AoC.Tests.Y2023D20Spec
+      AoC.Tests.Y2023D21Spec
       Paths_aoc
   hs-source-dirs:
       test
@@ -313,6 +319,7 @@ test-suite spec
   build-depends:
       advent-of-code-ocr
     , aoc
+    , arithmoi
     , base >=4.7 && <5
     , bytestring
     , containers

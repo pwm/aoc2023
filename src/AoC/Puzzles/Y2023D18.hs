@@ -7,8 +7,8 @@ import AoC.Lib.Prelude
 import Data.Map.Strict qualified as Map
 import Data.Set qualified as Set
 
-parse :: String -> Maybe ()
-parse _ = Just ()
+parse :: String -> Maybe [(Dir4, Int, String)]
+parse = parseMaybe (lineP `sepEndBy` newline)
 
 solveA :: a -> ()
 solveA _ = ()
@@ -16,10 +16,27 @@ solveA _ = ()
 solveB :: a -> ()
 solveB _ = ()
 
+type Grid = GridOf String
+
+lineP :: Parser (Dir4, Int, String)
+lineP = do
+  d <- enumParser show parseDir4 <* char ' '
+  n <- intP
+  s <- strP "(#" *> count 6 alphaNumChar <* strP ")"
+  pure (d, n, s)
+
+parseDir4 :: String -> Maybe Dir4
+parseDir4 = \case
+  "U" -> Just U
+  "R" -> Just R
+  "D" -> Just D
+  "L" -> Just L
+  _ -> Nothing
+
 ---------------------------------------------------------------------------
 -- https://adventofcode.com/2023/day/18
 
-p :: String -> ()
+p :: String -> [(Dir4, Int, String)]
 p = fromJust . parse
 
 s0 :: String

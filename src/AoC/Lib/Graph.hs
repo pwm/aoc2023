@@ -25,12 +25,6 @@ dfsTo found nexts from = go mempty [from]
       | Set.member node seen = go seen unseen
       | otherwise = node : go (Set.insert node seen) (nexts node <> unseen)
 
--- Explore all reachable nodes from a list of nodes
--- Note: from a list of roots it will explore the entire graph
--- inefficient as the seen state is lost between roots
-dfsAll :: (Ord n) => (n -> [n]) -> [n] -> [n]
-dfsAll nexts = nubOrd . concatMap (dfs nexts)
-
 -- All paths from node to a dest node
 dfsPathsTo :: forall n. (Ord n) => (n -> Bool) -> (n -> [n]) -> n -> [[n]]
 dfsPathsTo found nexts = map reverse . go []
@@ -46,10 +40,6 @@ dfsPathsTo found nexts = map reverse . go []
 dfsPaths :: (Ord n) => (n -> [n]) -> n -> [[n]]
 dfsPaths nexts = dfsPathsTo (null . nexts) nexts -- does not handle cycles (ie. from == node)
 
--- Literally select the shortest path to a dest node
-dfsSPTo :: (Ord n) => (n -> Bool) -> (n -> [n]) -> n -> [n]
-dfsSPTo found nexts = minimumBy (comparing length) . dfsPathsTo found nexts
-
 ---------------------------------------------------------------------------
 -- BFS
 
@@ -59,7 +49,7 @@ bfs = bfsTill (const False)
 bfsTill :: forall n. (Ord n) => (n -> Bool) -> (n -> [n]) -> n -> [(n, Int)]
 bfsTill found nexts from = go mempty (Seq.fromList [(from, 0)])
   where
-    go :: Set n -> Seq.Seq (n, Int) -> [(n, Int)]
+    go :: Set n -> Seq (n, Int) -> [(n, Int)]
     go _ Seq.Empty = []
     go seen ((node, d) :<| unseen)
       | found node = [(node, d)]
