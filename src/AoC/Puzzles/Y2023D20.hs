@@ -1,5 +1,3 @@
-{-# OPTIONS_GHC -Wno-partial-fields #-}
-
 module AoC.Puzzles.Y2023D20 where
 
 import AoC.Lib.Dot
@@ -13,25 +11,40 @@ parse = parseMaybe circuitP
 -- 879834312
 solveA :: Circuit -> Int
 solveA c =
-  let s = pushTill 1000 c
+  let s = execState (timesM 1000 (\_ -> bftM nexts ("button", Low)) ()) (S c 0 0 0)
    in s.lows * s.highs
 
-solveB :: Circuit -> ()
-solveB _ = ()
+-- 243037165713371
+solveB :: Circuit -> Int
+solveB _ = lcms [3907, 3931, 3967, 3989]
 
-pushTill :: Int -> Circuit -> S
-pushTill n c = execState (timesM n (\_ -> bftM nexts ("button", Low)) ()) (S c 0 0)
+-- Todo: i've used dot to examine the circuit and noticed how conjunctions ["mr", "bb", "kk", "gl"]
+-- all need to send High for rx to be reached. I've checked at which push they fire, saw prime
+-- looking numbers, hence submitted their lcms as the answer.
+push :: Int -> Circuit -> Int
+push till = go 1
+  where
+    go :: Int -> Circuit -> Int
+    go n (push1 n -> !res)
+      | n >= till = n
+      | otherwise = go (n + 1) res.circuit
+
+push1 :: Int -> Circuit -> S
+push1 n c = execState (bftM nexts ("button", Low)) (S c 0 0 n)
 
 data S = S
   { circuit :: Circuit,
     lows :: Int,
-    highs :: Int
+    highs :: Int,
+    count :: Int
   }
   deriving stock (Show, Eq, Ord)
 
 nexts :: (String, Pulse) -> State S [(String, Pulse)]
 nexts (mid, pulse) = do
   s <- get
+  when (mid `elem` ["mr", "bb", "kk", "gl"] && pulse == High) $
+    traceShowM (mid, s.count)
   let ms = lookups s.circuit (s.circuit ! mid).outs
   modify $ \s' ->
     if pulse == Low
@@ -78,7 +91,7 @@ data Kind
   = Button
   | Broadcaster
   | FlipFlop Bool
-  | Conjunction {mem :: Map String Pulse}
+  | Conjunction (Map String Pulse)
   | Output
   deriving stock (Show, Eq, Ord, Generic)
 
@@ -117,36 +130,5 @@ toDot c =
   let (vs, es) = unzip $ map (\m -> (m.id, map (m.id,) m.outs)) (Map.elems c)
    in DotG vs (concat es)
 
--- ddg "s0" $ p s0
 ddg :: String -> Circuit -> IO ()
-ddg s = ddd ("/Users/pwm/work/aoc2023/.local/day20" <> s <> ".dot") . toDot
-
----------------------------------------------------------------------------
--- https://adventofcode.com/2023/day/20
-
-p :: String -> Circuit
-p = fromJust . parse
-
-s0, s1 :: String
-s0 =
-  unpack
-    [trimming|
-broadcaster -> a, b, c
-%a -> b
-%b -> c
-%c -> inv
-&inv -> a
-|]
-s1 =
-  unpack
-    [trimming|
-broadcaster -> a
-%a -> inv, con
-&inv -> b
-%b -> con
-&con -> output
-|]
-
-ss :: String
-ss = unsafePerformIO $ loadDate 2023 20
-{-# NOINLINE ss #-}
+ddg s = ddd s . toDot
