@@ -57,6 +57,8 @@ library
       AoC.Puzzles.Y2023D20
       AoC.Puzzles.Y2023D21
       AoC.Puzzles.Y2023D22
+      AoC.Puzzles.Y2023D23
+      AoC.Puzzles.Y2023D24
   other-modules:
       Paths_aoc
   hs-source-dirs:
@@ -125,6 +127,7 @@ library
     , ghc
     , graphviz
     , hashable
+    , hmatrix
     , http-client
     , http-types
     , lens
@@ -217,6 +220,7 @@ executable aoc
     , ghc
     , graphviz
     , hashable
+    , hmatrix
     , http-client
     , http-types
     , lens
@@ -267,6 +271,8 @@ test-suite spec
       AoC.Tests.Y2023D20Spec
       AoC.Tests.Y2023D21Spec
       AoC.Tests.Y2023D22Spec
+      AoC.Tests.Y2023D23Spec
+      AoC.Tests.Y2023D24Spec
       Paths_aoc
   hs-source-dirs:
       test
@@ -335,6 +341,7 @@ test-suite spec
     , ghc
     , graphviz
     , hashable
+    , hmatrix
     , hspec
     , http-client
     , http-types

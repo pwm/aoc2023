@@ -50,7 +50,7 @@ parseCell = \case
 ---------------------------------------------------------------------------
 -- https://adventofcode.com/2023/day/21
 
-ppg :: GridOf Cell -> IO ()
+ppg :: Grid -> IO ()
 ppg = putStrLn . printGrid (\case Dot -> "."; Rock -> "#"; Start -> "S")
 
 p :: String -> Grid

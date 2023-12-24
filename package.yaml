@@ -24,6 +24,7 @@ dependencies:
   - hashable
   - http-client
   - http-types
+  - hmatrix
   - lens
   - logict
   - megaparsec
