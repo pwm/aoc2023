@@ -2,6 +2,7 @@ module AoC.Core.Solver
   ( Solutions,
     solvePuzzle,
     mkSolverFor,
+    mkIOSolverFor,
   )
 where
 
@@ -27,10 +28,29 @@ mkSolverFor ::
   (i -> b) ->
   (Date -> IO ())
 mkSolverFor parse solveA solveB date = do
+  input <- getInput parse date
+  let a = solveA input
+      b = solveB input
+  print (a, b) >> rtsStats
+
+mkIOSolverFor ::
+  (Show a, Show b) =>
+  (String -> Maybe i) ->
+  (i -> IO a) ->
+  (i -> IO b) ->
+  (Date -> IO ())
+mkIOSolverFor parse solveA solveB date = do
+  input <- getInput parse date
+  a <- solveA input
+  b <- solveB input
+  print (a, b) >> rtsStats
+
+getInput :: (String -> Maybe i) -> Date -> IO i
+getInput parse date = do
   inputFile <- readInput date
   case parse inputFile of
     Nothing -> print ("Cannot parse " <> inputName date) >> exitFailure
-    Just input -> print (solveA input, solveB input) >> rtsStats
+    Just input -> pure input
 
 rtsStats :: IO ()
 rtsStats = do

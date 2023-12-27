@@ -59,6 +59,7 @@ library
       AoC.Puzzles.Y2023D22
       AoC.Puzzles.Y2023D23
       AoC.Puzzles.Y2023D24
+      AoC.Puzzles.Y2023D25
   other-modules:
       Paths_aoc
   hs-source-dirs:
@@ -143,6 +144,7 @@ library
     , primitive
     , random
     , req
+    , safe
     , split
     , text
     , time
@@ -236,6 +238,7 @@ executable aoc
     , primitive
     , random
     , req
+    , safe
     , split
     , text
     , time
@@ -273,6 +276,7 @@ test-suite spec
       AoC.Tests.Y2023D22Spec
       AoC.Tests.Y2023D23Spec
       AoC.Tests.Y2023D24Spec
+      AoC.Tests.Y2023D25Spec
       Paths_aoc
   hs-source-dirs:
       test
@@ -358,6 +362,7 @@ test-suite spec
     , primitive
     , random
     , req
+    , safe
     , split
     , text
     , time

@@ -14,15 +14,18 @@ data DotG a = DotG
   }
   deriving stock (Show, Eq, Ord, Generic)
 
-ddd :: (Ord a, PrintDot a) => String -> DotG a -> IO ()
-ddd path = T.writeFile path . ppd
+data Directed = Undirected | Directed
+  deriving stock (Show, Eq, Ord, Generic)
 
-ppd :: (Ord n, PrintDot n) => DotG n -> Text
-ppd = TL.toStrict . printDotGraph . toDotGraph
+ddd :: (Ord a, PrintDot a) => String -> Directed -> DotG a -> IO ()
+ddd path dir = T.writeFile path . ppd dir
 
-toDotGraph :: (Ord a) => DotG a -> DotGraph a
-toDotGraph g =
+ppd :: (Ord n, PrintDot n) => Directed -> DotG n -> Text
+ppd dir = TL.toStrict . printDotGraph . toDotGraph dir
+
+toDotGraph :: (Ord a) => Directed -> DotG a -> DotGraph a
+toDotGraph dir g =
   graphElemsToDot
-    nonClusteredParams
+    nonClusteredParams {isDirected = case dir of Undirected -> False; Directed -> True}
     (map (\n -> (n, ())) g.vertices)
     (map (\(f, t) -> (f, t, ())) g.edges)

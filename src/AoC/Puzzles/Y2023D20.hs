@@ -131,4 +131,4 @@ toDot c =
    in DotG vs (concat es)
 
 ddg :: String -> Circuit -> IO ()
-ddg s = ddd s . toDot
+ddg s = ddd s Directed . toDot

@@ -38,6 +38,7 @@ dependencies:
   - primitive
   - random
   - req
+  - safe
   - split
   - text
   - time
