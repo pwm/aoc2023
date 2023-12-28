@@ -30,11 +30,9 @@ walk (dirs, graph) found start = go start (cycle dirs)
     go _ _ = []
 
 lkp :: Graph -> String -> Dir -> String
-lkp g n dir = case g !? n of
-  Nothing -> error $ "no node " <> n
-  Just (l, r) -> case dir of
-    L -> l
-    R -> r
+lkp g n dir | (l, r) <- g ! n = case dir of
+  L -> l
+  R -> r
 
 data Dir = L | R
   deriving stock (Show, Eq, Ord, Bounded, Enum)
