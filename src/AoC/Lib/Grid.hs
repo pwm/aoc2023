@@ -136,15 +136,20 @@ lookupNs9 p m = lookups m (adj9 p)
 lookupKNs9 :: Pos -> GridOf a -> [(Pos, a)]
 lookupKNs9 p m = lookupsKey m (adj9 p)
 
-mkRect :: Pos -> Pos -> [Pos]
-mkRect (upLeftX, upLeftY) (downRightX, downRightY) =
-  liftA2 (,) [upLeftX .. downRightX] [upLeftY .. downRightY]
+mkRect :: (Pos, Pos) -> [Pos]
+mkRect ((vlo, hlo), (vhi, hhi)) = liftA2 (,) [vlo .. vhi] [hlo .. hhi]
 
 mkSquare :: Int -> [Pos]
-mkSquare n = mkRect (0, 0) (n - 1, n - 1)
+mkSquare n = mkRect ((0, 0), (n - 1, n - 1))
 
 bounds :: GridOf a -> (Pos, Pos)
-bounds g = (fst (Map.findMin g), fst (Map.findMax g))
+bounds g =
+  let ks = Map.keys g
+      vlo = fst $ minimumBy (comparing fst) ks
+      hlo = snd $ minimumBy (comparing snd) ks
+      vhi = fst $ maximumBy (comparing fst) ks
+      hhi = snd $ maximumBy (comparing snd) ks
+   in ((vlo, hlo), (vhi, hhi))
 
 --
 

@@ -7,16 +7,51 @@ import AoC.Lib.Prelude
 import Data.Map.Strict qualified as Map
 import Data.Set qualified as Set
 
+{-
+https://en.wikipedia.org/wiki/Pick%27s_theorem
+-}
+
 parse :: String -> Maybe [(Dir4, Int, String)]
 parse = parseMaybe (lineP `sepEndBy` newline)
 
-solveA :: a -> ()
-solveA _ = ()
+-- 76387
+solveA :: [(Dir4, Int, String)] -> Int
+solveA ls =
+  let (d1, d2) = fromJust $ l2p $ take 2 $ map fstOf3 ls
+   in Map.size $ fill (d1, d2) $ dig ls
 
-solveB :: a -> ()
+solveB :: [(Dir4, Int, String)] -> ()
 solveB _ = ()
 
 type Grid = GridOf String
+
+fill :: (Dir4, Dir4) -> Grid -> Grid
+fill (d1, d2) g =
+  Map.union g
+    . Map.fromList
+    . map ((,"X") . fst)
+    . bfs (filter (`Map.notMember` g) . adj4)
+    $ inside (0, 0) (d1, d2)
+
+dig :: [(Dir4, Int, String)] -> Grid
+dig = fst . foldl' digLine (mempty, (0, 0))
+  where
+    digLine :: (Grid, Pos) -> (Dir4, Int, String) -> (Grid, Pos)
+    digLine (g, pos) (dir, stepCount, cell) =
+      let steps = drop 1 $ take (stepCount + 1) $ iterate (`step4` dir) pos
+       in (Map.fromList (map (,cell) steps) <> g, last steps)
+
+inside :: Pos -> (Dir4, Dir4) -> Pos
+inside (v, h) = \case
+  (R, D) -> (v + 1, h + 1)
+  (R, U) -> (v - 1, h + 1)
+  (L, D) -> (v + 1, h - 1)
+  (L, U) -> (v - 1, h - 1)
+  (D, L) -> (v + 1, h - 1)
+  (D, R) -> (v + 1, h + 1)
+  (U, L) -> (v - 1, h - 1)
+  (U, R) -> (v - 1, h + 1)
+  _ -> error "not an angled line"
 
 lineP :: Parser (Dir4, Int, String)
 lineP = do
@@ -32,6 +67,15 @@ parseDir4 = \case
   "D" -> Just D
   "L" -> Just L
   _ -> Nothing
+
+-------------------------------------------------------------------------------
+-- PP
+
+ddg :: Grid -> IO ()
+ddg = putStrLn . printGrid (\case "." -> "."; _ -> "X") . fillSpace
+
+fillSpace :: Grid -> Grid
+fillSpace g = g <> Map.fromList (map (,".") $ mkRect (bounds g))
 
 ---------------------------------------------------------------------------
 -- https://adventofcode.com/2023/day/18
