@@ -40,6 +40,11 @@ dfsPathsTo found nexts = map reverse . go []
 dfsPaths :: (Ord n) => (n -> [n]) -> n -> [[n]]
 dfsPaths nexts = dfsPathsTo (null . nexts) nexts -- does not handle cycles (ie. from == node)
 
+-- Literally select the shortest/longest path to a dest node
+dfsSPTo, dfsLPTo :: (Ord n) => (n -> Bool) -> (n -> [n]) -> n -> [n]
+dfsSPTo found nexts = minimumBy (comparing length) . dfsPathsTo found nexts
+dfsLPTo found nexts = maximumBy (comparing length) . dfsPathsTo found nexts
+
 ---------------------------------------------------------------------------
 -- BFS
 
