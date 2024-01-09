@@ -45,6 +45,11 @@ dependencies:
   - transformers
   - unordered-containers
   - vector
+  # Test dependencies
+  - QuickCheck
+  - generic-random
+  - hspec
+  - quickcheck-instances
 
 library:
   source-dirs: src
@@ -68,7 +73,6 @@ tests:
       - -threaded
       - -rtsopts
     dependencies:
-      - hspec
       - aoc
 
 default-extensions:

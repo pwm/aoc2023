@@ -32,6 +32,7 @@ library
       AoC.Lib.Dot
       AoC.Lib.Graph
       AoC.Lib.Grid
+      AoC.Lib.Interval
       AoC.Lib.Memo
       AoC.Lib.Parser
       AoC.Lib.Prelude
@@ -113,7 +114,8 @@ library
       ViewPatterns
   ghc-options: -Weverything -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missed-specialisations -Wno-all-missed-specialisations -Wno-unsafe -Wno-safe -Wno-missing-local-signatures -Wno-monomorphism-restriction -Wno-missing-export-lists -Wno-missing-home-modules -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unused-packages -Wno-implicit-prelude -Wno-missing-kind-signatures -Wno-unticked-promoted-constructors
   build-depends:
-      advent-of-code-ocr
+      QuickCheck
+    , advent-of-code-ocr
     , arithmoi
     , base >=4.7 && <5
     , bytestring
@@ -125,10 +127,12 @@ library
     , either
     , filepath
     , generic-lens
+    , generic-random
     , ghc
     , graphviz
     , hashable
     , hmatrix
+    , hspec
     , http-client
     , http-types
     , lens
@@ -142,6 +146,7 @@ library
     , pqueue
     , pretty-simple
     , primitive
+    , quickcheck-instances
     , random
     , req
     , safe
@@ -206,7 +211,8 @@ executable aoc
       ViewPatterns
   ghc-options: -Weverything -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missed-specialisations -Wno-all-missed-specialisations -Wno-unsafe -Wno-safe -Wno-missing-local-signatures -Wno-monomorphism-restriction -Wno-missing-export-lists -Wno-missing-home-modules -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unused-packages -Wno-implicit-prelude -Wno-missing-kind-signatures -Wno-unticked-promoted-constructors -threaded -rtsopts
   build-depends:
-      advent-of-code-ocr
+      QuickCheck
+    , advent-of-code-ocr
     , aoc
     , arithmoi
     , base >=4.7 && <5
@@ -219,10 +225,12 @@ executable aoc
     , either
     , filepath
     , generic-lens
+    , generic-random
     , ghc
     , graphviz
     , hashable
     , hmatrix
+    , hspec
     , http-client
     , http-types
     , lens
@@ -236,6 +244,7 @@ executable aoc
     , pqueue
     , pretty-simple
     , primitive
+    , quickcheck-instances
     , random
     , req
     , safe
@@ -251,32 +260,32 @@ test-suite spec
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      AoC.Puzzles.Y2023D01Spec
+      AoC.Puzzles.Y2023D02Spec
+      AoC.Puzzles.Y2023D03Spec
+      AoC.Puzzles.Y2023D04Spec
+      AoC.Puzzles.Y2023D05Spec
+      AoC.Puzzles.Y2023D06Spec
+      AoC.Puzzles.Y2023D07Spec
+      AoC.Puzzles.Y2023D08Spec
+      AoC.Puzzles.Y2023D09Spec
+      AoC.Puzzles.Y2023D10Spec
+      AoC.Puzzles.Y2023D11Spec
+      AoC.Puzzles.Y2023D12Spec
+      AoC.Puzzles.Y2023D13Spec
+      AoC.Puzzles.Y2023D14Spec
+      AoC.Puzzles.Y2023D15Spec
+      AoC.Puzzles.Y2023D16Spec
+      AoC.Puzzles.Y2023D17Spec
+      AoC.Puzzles.Y2023D18Spec
+      AoC.Puzzles.Y2023D19Spec
+      AoC.Puzzles.Y2023D20Spec
+      AoC.Puzzles.Y2023D21Spec
+      AoC.Puzzles.Y2023D22Spec
+      AoC.Puzzles.Y2023D23Spec
+      AoC.Puzzles.Y2023D24Spec
+      AoC.Puzzles.Y2023D25Spec
       AoC.Tester
-      AoC.Tests.Y2023D01Spec
-      AoC.Tests.Y2023D02Spec
-      AoC.Tests.Y2023D03Spec
-      AoC.Tests.Y2023D04Spec
-      AoC.Tests.Y2023D05Spec
-      AoC.Tests.Y2023D06Spec
-      AoC.Tests.Y2023D07Spec
-      AoC.Tests.Y2023D08Spec
-      AoC.Tests.Y2023D09Spec
-      AoC.Tests.Y2023D10Spec
-      AoC.Tests.Y2023D11Spec
-      AoC.Tests.Y2023D12Spec
-      AoC.Tests.Y2023D13Spec
-      AoC.Tests.Y2023D14Spec
-      AoC.Tests.Y2023D15Spec
-      AoC.Tests.Y2023D16Spec
-      AoC.Tests.Y2023D17Spec
-      AoC.Tests.Y2023D18Spec
-      AoC.Tests.Y2023D19Spec
-      AoC.Tests.Y2023D20Spec
-      AoC.Tests.Y2023D21Spec
-      AoC.Tests.Y2023D22Spec
-      AoC.Tests.Y2023D23Spec
-      AoC.Tests.Y2023D24Spec
-      AoC.Tests.Y2023D25Spec
       Paths_aoc
   hs-source-dirs:
       test
@@ -329,7 +338,8 @@ test-suite spec
       ViewPatterns
   ghc-options: -Weverything -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missed-specialisations -Wno-all-missed-specialisations -Wno-unsafe -Wno-safe -Wno-missing-local-signatures -Wno-monomorphism-restriction -Wno-missing-export-lists -Wno-missing-home-modules -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unused-packages -Wno-implicit-prelude -Wno-missing-kind-signatures -Wno-unticked-promoted-constructors -threaded -rtsopts
   build-depends:
-      advent-of-code-ocr
+      QuickCheck
+    , advent-of-code-ocr
     , aoc
     , arithmoi
     , base >=4.7 && <5
@@ -342,6 +352,7 @@ test-suite spec
     , either
     , filepath
     , generic-lens
+    , generic-random
     , ghc
     , graphviz
     , hashable
@@ -360,6 +371,7 @@ test-suite spec
     , pqueue
     , pretty-simple
     , primitive
+    , quickcheck-instances
     , random
     , req
     , safe
