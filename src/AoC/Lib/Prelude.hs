@@ -42,6 +42,8 @@ module AoC.Lib.Prelude
     lastOr,
     minimumOr,
     maximumOr,
+    minimumByOr,
+    maximumByOr,
     takeEnd,
     dropEnd,
     rotL1,
@@ -54,7 +56,9 @@ module AoC.Lib.Prelude
     rsort,
     charAt,
     l2p,
+    l2ps,
     l2p3,
+    l2p3s,
     t2l,
     tupleMin,
     tupleMax,
@@ -101,7 +105,7 @@ import Data.Bits as X
 import Data.Char as X (chr, ord)
 import Data.Containers.ListUtils as X
 import Data.Either as X
-import Data.Foldable as X (Foldable (..), asum, traverse_)
+import Data.Foldable as X
 import Data.Function as X
 import Data.Functor as X
 import Data.Functor.Identity as X (Identity (..))
@@ -324,8 +328,12 @@ minimumOr, maximumOr :: (Foldable t, Ord a) => a -> t a -> a
 minimumOr = withDefault minimum
 maximumOr = withDefault maximum
 
-withDefault :: (Foldable t) => (t a -> a) -> a -> t a -> a
-withDefault f def = fromMaybe def . (\t -> if null t then Nothing else Just (f t))
+minimumByOr, maximumByOr :: (Foldable t) => a -> (a -> a -> Ordering) -> t a -> a
+minimumByOr a f = minimumBy f `withDefault` a
+maximumByOr a f = maximumBy f `withDefault` a
+
+withDefault :: (Foldable t) => (t a -> a) -> a -> (t a -> a)
+withDefault f def t = if null t then def else f t
 
 -- >>> (takeEnd 1 [], takeEnd 1 [1], takeEnd 1 [1,2], takeEnd 1 [1..3])
 -- ([],[1],[2],[3])
@@ -386,11 +394,19 @@ l2p :: [a] -> Maybe (a, a)
 l2p [a, b] = Just (a, b)
 l2p _ = Nothing
 
+-- >>> (l2ps [1 .. 4], l2ps [1 .. 3])
+l2ps :: [a] -> [(a, a)]
+l2ps xs = [(a, b) | [a, b] <- chunksOf 2 xs]
+
 -- >>> (l2p3 [1, 2, 3], l2p3 [1, 2])
 -- (Just (1,2,3),Nothing)
 l2p3 :: [a] -> Maybe (a, a, a)
 l2p3 [a, b, c] = Just (a, b, c)
 l2p3 _ = Nothing
+
+-- >>> (l2p3s [1 .. 9], l2ps [1 .. 8])
+l2p3s :: [a] -> [(a, a, a)]
+l2p3s xs = [(a, b, c) | [a, b, c] <- chunksOf 3 xs]
 
 -- >>> t2l (1, 2, 3, 4, 5)
 -- [1,2,3,4,5]

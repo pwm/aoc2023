@@ -1,4 +1,4 @@
-module AoC.Tests.Y2023D11Spec (spec) where
+module AoC.Puzzles.Y2023D11Spec (spec) where
 
 import AoC.Core.Date
 import AoC.Puzzles.Y2023D11
