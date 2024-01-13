@@ -99,6 +99,7 @@ import Control.Monad.Combinators as X
 import Control.Monad.Logic (MonadLogic, interleave)
 import Control.Monad.Reader as X
 import Control.Monad.State.Strict as X
+import Control.Parallel.Strategies as X hiding (seqList)
 import Data.Bifunctor as X
 import Data.Bitraversable as X
 import Data.Bits as X

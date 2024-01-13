@@ -4,7 +4,6 @@ import AoC.Lib.Graph
 import AoC.Lib.Grid
 import AoC.Lib.Parser
 import AoC.Lib.Prelude
-import Control.Parallel.Strategies
 import Data.Map.Strict qualified as Map
 import Data.Set qualified as Set
 

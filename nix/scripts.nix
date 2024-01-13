@@ -2,7 +2,7 @@
   logo = pkgs.writeShellScriptBin "logo" ''
     set -euo pipefail
     echo -e "\n$(tput setaf 2)"
-    echo "AoC . $(date +'%Y')" | ${pkgs.figlet}/bin/figlet
+    echo "AoC" | ${pkgs.figlet}/bin/figlet
     echo -e "$(tput sgr0)\n"
   '';
   build = pkgs.writeShellScriptBin "build" ''
