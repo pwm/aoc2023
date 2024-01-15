@@ -43,7 +43,7 @@ jobs:
             log-lines = 1000
 
       - name: Install Cachix
-        uses: cachix/cachix-action@v13
+        uses: cachix/cachix-action@v14
         with:
           name: pwm
           signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
