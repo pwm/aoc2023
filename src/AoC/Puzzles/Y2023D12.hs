@@ -1,59 +1,37 @@
 module AoC.Puzzles.Y2023D12 where
 
-import AoC.Lib.Parser
+import AoC.Lib.Memo
 import AoC.Lib.Prelude
-import Data.Map.Strict qualified as Map
-import Data.Set qualified as Set
 
 parse :: String -> Maybe [(String, [Int])]
 parse =
   traverse
-    ( (\(a, b) -> (,) a <$> traverse readMaybe (splitOn "," b))
-        <=< l2p . splitOn " "
-    )
+    ((\(a, b) -> (a,) <$> traverse readMaybe (splitOn "," b)) <=< l2p . splitOn " ")
     . lines
 
--- 6949
 solveA :: [(String, [Int])] -> Int
-solveA = sum . map (\(s, ns) -> length $ filter (check ns) $ last $ levels $ bt s)
+solveA = sum . map solve1
 
-solveB :: [(String, [Int])] -> ()
-solveB _ = ()
+solveB :: [(String, [Int])] -> Int
+solveB = sum . map (solve1 . extend)
 
-bt :: String -> Tree String
-bt = unfoldTree $ \s ->
-  (s, if '?' `elem` s then [replace '.' s, replace '#' s] else [])
+solve1 :: (String, [Int]) -> Int
+solve1 (pat0, clue0) = memoMap go (0, length pat, length clue)
+  where
+    pat = "." <> pat0 <> "."
+    clue = "." <> intercalate "." [replicate n '#' | n <- clue0] <> "."
+    go :: (Monad m) => ((Int, Int, Int) -> m Int) -> (Int, Int, Int) -> m Int
+    go rec (acc, pIdx, cIdx)
+      | pIdx == 0 && cIdx == 0 = pure 1
+      | (pIdx == 0) /= (cIdx == 0) = pure 0
+      | pat !! (pIdx - 1) `elem` ['#', '?'] && clue !! (cIdx - 1) == '#' = do
+          r1 <- rec (acc, pIdx - 1, cIdx - 1)
+          pure $ acc + r1
+      | pat !! (pIdx - 1) `elem` ['.', '?'] && clue !! (cIdx - 1) == '.' = do
+          r1 <- rec (acc, pIdx - 1, cIdx)
+          r2 <- rec (acc, pIdx - 1, cIdx - 1)
+          pure $ acc + r1 + r2
+      | otherwise = pure acc
 
-check :: [Int] -> String -> Bool
-check xs s =
-  let f = map length . filter ('#' `elem`) . group
-   in f s == xs
-
-replace :: Char -> String -> String
-replace _ [] = []
-replace c (x : xs)
-  | x == '?' = c : xs
-  | otherwise = x : replace c xs
-
----------------------------------------------------------------------------
--- Test data
-
-p :: String -> [(String, [Int])]
-p = fromJust . parse
-
-s0 :: String
-s0 =
-  unpack
-    [trimming|
-???.### 1,1,3
-.??..??...?##. 1,1,3
-?#?#?#?#?#?#?#? 1,3,1,6
-????.#...#... 4,1,1
-????.######..#####. 1,6,5
-?###???????? 3,2,1
-|]
-
--- load actual input from the downloaded file
-ss :: String
-ss = unsafePerformIO $ loadDate 2023 12
-{-# NOINLINE ss #-}
+extend :: (String, [Int]) -> (String, [Int])
+extend (s, xs) = (intercalate "?" (replicate 5 s), concat (replicate 5 xs))
